@@ -1,6 +1,6 @@
 {
   "name": "grunt-writing",
-  "description": "A markdown templater",
+  "description": "Generate a simple collection of HTML posts from markdown, and an index of teasers.",
   "version": "0.0.1",
   "homepage": "https://github.com/colingourlay/grunt-writing",
   "author": {
@@ -25,13 +25,7 @@
   "engines": {
     "node": ">= 0.8.0"
   },
-  "scripts": {
-    "test": "grunt test"
-  },
   "devDependencies": {
-    "grunt-contrib-jshint": "~0.6.0",
-    "grunt-contrib-clean": "~0.4.0",
-    "grunt-contrib-nodeunit": "~0.2.0",
     "grunt": "~0.4.1"
   },
   "peerDependencies": {
@@ -39,5 +33,12 @@
   },
   "keywords": [
     "gruntplugin"
-  ]
+  ],
+  "dependencies": {
+    "jade": "~0.34.1",
+    "js-yaml": "~2.1.0",
+    "lodash": "~1.3.1",
+    "marked": "~0.2.9",
+    "pygmentize-bundled": "~1.0.1"
+  }
 }

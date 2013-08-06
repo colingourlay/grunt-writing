@@ -8,43 +8,87 @@
 
 'use strict';
 
-module.exports = function(grunt) {
+var fs = require('fs');
+// var path = require('path');
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
+var _ = require('lodash');
+var jade = require('jade');
+var jsYAML = require('js-yaml');
+var marked = require('marked');
+var pygmentize = require('pygmentize-bundled');
 
-  grunt.registerMultiTask('writing', 'Your task description goes here.', function() {
-    // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
-      punctuation: '.',
-      separator: ', '
+marked.setOptions({
+  gfm: true,
+  anchors: true,
+  highlight: function (code, lang, callback) {
+    pygmentize({
+      format: 'html',
+      lang: lang
+    }, code, function (err, result) {
+      callback(err, result.toString());
     });
+  }
+});
 
-    // Iterate over all specified file groups.
-    this.files.forEach(function(f) {
-      // Concat specified files.
-      var src = f.src.filter(function(filepath) {
-        // Warn on and remove invalid source files (if nonull was set).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
-          return false;
+function writing(grunt) {
+  grunt.registerMultiTask('writing', 'Combines markdown and templates to create static pages.', function () {
+    var task = this;
+    var done = task.async();
+    var options = task.options();
+
+    var templates = {
+      post: jade.compile(fs.readFileSync(task.data.templates.post, 'utf8'), {pretty: true, filename: task.data.templates.post}),
+      index: jade.compile(fs.readFileSync(task.data.templates.index, 'utf8'), {pretty: true, filename: task.data.templates.index})
+    };
+
+    var posts = [];
+    var numRemainingPosts = task.data.posts.length;
+
+    grunt.file.recurse(task.data.src, function (filepath) {
+      var post = {};
+      var text = fs.readFileSync(filepath, 'utf8');
+
+      try {
+        if (text.indexOf('----') === 0) {
+          post = jsYAML.load(text.split('----')[1]);
+          post.markdown = _.rest(text.split('----'), 2).join('');
         } else {
-          return true;
+          grunt.fail.fatal('incorrect metadata format: ' + filepath);
         }
-      }).map(function(filepath) {
-        // Read file source.
-        return grunt.file.read(filepath);
-      }).join(grunt.util.normalizelf(options.separator));
+      } catch (e) {
+        grunt.fail.fatal('exception while parsing: ' + filepath);
+      }
 
-      // Handle options.
-      src += options.punctuation;
+      if (!post.markdown.length) {
+        grunt.fail.fatal('no content: ' + filepath);
+      }
 
-      // Write the destination file.
-      grunt.file.write(f.dest, src);
+      post.url = '/' + filepath.split('/').reverse()[0].replace('.markdown', '/');
+      post.filepath = task.data.dest + post.url + 'index.html';
 
-      // Print a success message.
-      grunt.log.writeln('File "' + f.dest + '" created.');
+      marked(post.markdown, function (err, content) {
+        if (err) {
+          grunt.fail.fatal('failed to parse markdown: ', filepath);
+        }
+
+        post.content = content;
+        post.teaser = content.split('</p>')[0] + '</p>';
+        posts.push(post);
+
+        if (!numRemainingPosts--) {
+          posts = _.sortBy(posts, 'date');
+
+          _.each(posts, function (post) {
+            grunt.file.write(post.filepath, templates.post({post: post}));
+          });
+
+          grunt.file.write(task.data.dest + '/index.html', templates.index({posts: posts}));
+
+          done();
+        }
+      });
     });
   });
+}
 
-};
+module.exports = writing;
