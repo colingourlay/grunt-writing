@@ -1,6 +1,8 @@
 # grunt-writing
 
-> A static site generator
+> Generate a simple collection of HTML posts from markdown, and an index of teasers.
+
+[![NPM](https://nodei.co/npm/grunt-writing.png)](https://nodei.co/npm/grunt-writing/)
 
 ## Getting Started
 This plugin requires Grunt `~0.4.1`
