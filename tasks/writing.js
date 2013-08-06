@@ -42,7 +42,7 @@ function writing(grunt) {
     };
 
     var posts = [];
-    var numRemainingPosts = task.data.posts.length;
+    var numRemainingPosts = grunt.file.expand({filter: 'isFile'}, [task.data.src + '/**']).length;
 
     grunt.file.recurse(task.data.src, function (filepath) {
       var post = {};
@@ -75,7 +75,7 @@ function writing(grunt) {
         post.teaser = content.split('</p>')[0] + '</p>';
         posts.push(post);
 
-        if (!numRemainingPosts--) {
+        if (!--numRemainingPosts) {
           posts = _.sortBy(posts, 'date');
 
           _.each(posts, function (post) {
