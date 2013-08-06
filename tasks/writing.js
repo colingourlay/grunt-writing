@@ -76,7 +76,9 @@ function writing(grunt) {
         posts.push(post);
 
         if (!--numRemainingPosts) {
-          posts = _.sortBy(posts, 'date');
+          posts.sort(function (a, b) {
+            return b.date - a.date;
+          });
 
           _.each(posts, function (post) {
             grunt.file.write(post.filepath, templates.post({post: post}));
