@@ -9,7 +9,6 @@
 'use strict';
 
 var fs = require('fs');
-// var path = require('path');
 
 var _ = require('lodash');
 var jade = require('jade');
@@ -36,15 +35,22 @@ function writing(grunt) {
     var done = task.async();
     var options = task.options();
 
-    var templates = {
-      post: jade.compile(fs.readFileSync(task.data.templates.post, 'utf8'), {pretty: true, filename: task.data.templates.post}),
-      index: jade.compile(fs.readFileSync(task.data.templates.index, 'utf8'), {pretty: true, filename: task.data.templates.index})
-    };
+    var templates = {};
+    _.each(['post', 'index', 'archive'], function (template) {
+      var filename = task.data.templates + '/' + template + '.jade';
+
+      templates[template] = jade.compile(fs.readFileSync(filename, 'utf8'), {
+        pretty: true,
+        filename: filename
+      });
+
+      grunt.log.writeln('Compiled template: ' + filename);
+    });
 
     var posts = [];
-    var numRemainingPosts = grunt.file.expand({filter: 'isFile'}, [task.data.src + '/**']).length;
+    var numRemainingPosts = grunt.file.expand({filter: 'isFile'}, [task.data.posts + '/**']).length;
 
-    grunt.file.recurse(task.data.src, function (filepath) {
+    grunt.file.recurse(task.data.posts, function (filepath) {
       var post = {};
       var text = fs.readFileSync(filepath, 'utf8');
 
@@ -80,11 +86,25 @@ function writing(grunt) {
             return b.date - a.date;
           });
 
+          posts.forEach(function (post, index) {
+            if (index > 0) {
+              post.next = posts[index - 1];
+            }
+            if (index < posts.length - 1) {
+              post.previous = posts[index + 1];
+            }
+          });
+
           _.each(posts, function (post) {
             grunt.file.write(post.filepath, templates.post({post: post}));
+
+            grunt.log.writeln('Rendered post: ' + post.title);
           });
 
           grunt.file.write(task.data.dest + '/index.html', templates.index({posts: posts}));
+          grunt.log.writeln('Rendered Index page: /');
+          grunt.file.write(task.data.dest + '/archive/index.html', templates.archive({posts: posts}));
+          grunt.log.writeln('Rendered Archive page: /archive/');
 
           done();
         }

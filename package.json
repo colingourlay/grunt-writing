@@ -1,7 +1,7 @@
 {
   "name": "grunt-writing",
   "description": "Generate a simple collection of HTML posts from markdown, and an index of teasers.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/colingourlay/grunt-writing",
   "author": {
     "name": "Colin Gourlay",
