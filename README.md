@@ -57,7 +57,7 @@ grunt.initConfig({
         lang: 'en'
       },
       templates: 'src/templates',
-      src: 'src/posts',
+      posts: 'src/posts',
       dest: 'build'
     }
   }
