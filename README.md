@@ -27,7 +27,8 @@ In your project's Gruntfile, add a section named `writing` to the data object pa
 ```js
 grunt.initConfig({
   writing: {
-    '<target>': {      templates: '<directory_containing_jade_templates>',
+    '<target>': {
+      templates: '<directory_containing_jade_templates>',
       posts: '<directory_containing_markdown_posts>',
       dest: '<output_directory>'
     }
