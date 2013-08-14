@@ -15,6 +15,7 @@ var jade = require('jade');
 var jsYAML = require('js-yaml');
 var marked = require('marked');
 var pygmentize = require('pygmentize-bundled');
+var RSS = require('rss');
 
 marked.setOptions({
   gfm: true,
@@ -34,6 +35,19 @@ function writing(grunt) {
     var task = this;
     var done = task.async();
     var options = task.options();
+
+    var meta = task.data.meta || {};
+    meta.rssURL = meta.url + '/rss.xml';
+
+    var feed = new RSS({
+      title: meta.title,
+      description: meta.description,
+      author: meta.author,
+      site_url: meta.url,
+      feed_url: meta.rssURL,
+      pub_date: new Date(),
+      language: meta.lang
+    });
 
     var templates = {};
     _.each(['post', 'index', 'archive'], function (template) {
@@ -93,18 +107,24 @@ function writing(grunt) {
             if (index < posts.length - 1) {
               post.previous = posts[index + 1];
             }
-          });
 
-          _.each(posts, function (post) {
-            grunt.file.write(post.filepath, templates.post({post: post}));
-
+            grunt.file.write(post.filepath, templates.post({meta: meta, post: post}));
             grunt.log.writeln('Rendered post: ' + post.title);
+
+            feed.item({
+              title: post.title,
+              description: post.teaser,
+              url: meta.url + post.url,
+              date: post.date.toString()
+            });
           });
 
-          grunt.file.write(task.data.dest + '/index.html', templates.index({posts: posts}));
+          grunt.file.write(task.data.dest + '/index.html', templates.index({meta: meta, posts: posts}));
           grunt.log.writeln('Rendered Index page: /');
-          grunt.file.write(task.data.dest + '/archive/index.html', templates.archive({posts: posts}));
+          grunt.file.write(task.data.dest + '/archive/index.html', templates.archive({meta: meta, posts: posts}));
           grunt.log.writeln('Rendered Archive page: /archive/');
+          grunt.file.write(task.data.dest + '/rss.xml', feed.xml());
+          grunt.log.writeln('Rendered RSS Feed: /rss.xml');
 
           done();
         }
