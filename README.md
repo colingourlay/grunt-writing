@@ -29,11 +29,11 @@ grunt.initConfig({
   writing: {
     '<target>': {
       meta: {
-        title: <site_title>,
-        description: <site_description_(optional)>,
-        author: <site_author>,
-        url: <site_url>,
-        lang: <language_code_(optional)>
+        title: '<site_title>',
+        description: '<site_description_(optional)>',
+        author: '<site_author>',
+        url: '<site_url>',
+        lang: '<language_code_(optional)>'
       },
       templates: '<directory_containing_jade_templates>',
       posts: '<directory_containing_markdown_posts>',
@@ -51,7 +51,7 @@ grunt.initConfig({
     build: {
       meta: {
         title: 'The Blog',
-        description: 'IT\'s a blog,
+        description: 'IT\'s a blog',
         author: 'The Blogger',
         url: 'http://the-blog.com'
         lang: 'en'
