@@ -53,7 +53,7 @@ grunt.initConfig({
         title: 'The Blog',
         description: 'IT\'s a blog',
         author: 'The Blogger',
-        url: 'http://the-blog.com'
+        url: 'http://the-blog.com',
         lang: 'en'
       },
       templates: 'src/templates',
