@@ -73,3 +73,7 @@ The `post` object is available to the `post.jade` template. The `posts` array is
 #### RSS Feed
 
 The `rssURL` property is added to the `meta` object for use in templating.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/colingourlay/grunt-writing/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
